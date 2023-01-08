@@ -27,4 +27,4 @@ Route.get('/', () => {
 Route.group(() => {
   Route.post('/', 'LoginController.sendOtp')
   Route.post('/confirmotp', 'LoginController.confirmOtp')
-}).prefix('/login')
+}).prefix('/login').middleware('auth')
