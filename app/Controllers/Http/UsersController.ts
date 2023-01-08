@@ -6,30 +6,30 @@ import Otp from 'App/Models/Otp';
 export default class UsersController {
     loginController: LoginController = new LoginController()
 
-    public async updateUserName({ request, response, params }: HttpContextContract) {
+    public async updateUserName(ctx: HttpContextContract) {
         try {
-            console.log(params.id);
-            const user = await User.findOrFail(params.id)
+            console.log(ctx.params.id);
+            const user = await User.findOrFail(ctx.params.id)
 
             if (!user) {
-                return response.status(404).send({
+                return ctx.response.status(404).send({
                     code: 0,
                     message: 'user not found !',
                     data: []
                 });
             }
 
-            user.name = request.input('name')
+            user.name = ctx.request.input('name')
             const updatedUser = await user.save()
 
-            return response.status(203).send({
+            return ctx.response.status(203).send({
                 code: 1,
                 message: 'User updated successfully !',
                 data: updatedUser
             })
 
         } catch (error) {
-            return response.status(500).send({
+            return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
                 data: []
@@ -37,9 +37,9 @@ export default class UsersController {
         }
     }
 
-    public async updataPhone({ request, response }: HttpContextContract) {
+    public async updataPhone(ctx: HttpContextContract) {
         try {
-            const searchPayload = { phone_number: request.input('phone_number') }
+            const searchPayload = { phone_number: ctx.request.input('phone_number') }
 
             const generatedOtp: string = otpGenerator.generate(5, {
                 digits: true,
@@ -51,7 +51,7 @@ export default class UsersController {
             console.log(generatedOtp)
 
             const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
-            return response.created({
+            return ctx.response.created({
                 code: 1,
                 message: 'Otp created succefully',
                 data: savedOtp,
@@ -59,7 +59,7 @@ export default class UsersController {
 
 
         } catch (error) {
-            return response.status(500).send({
+            return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
                 data: []
@@ -68,33 +68,33 @@ export default class UsersController {
     }
 
 
-    public async confirmUpdatePhone({ request, response, params }: HttpContextContract) {
-        const phoneNumber = request.input('phone_number')
-        const otp = request.input('otp')
+    public async confirmUpdatePhone(ctx: HttpContextContract) {
+        const phoneNumber = ctx.request.input('phone_number')
+        const otp = ctx.request.input('otp')
 
         try {
             const foundOtp = await Otp.findBy('phone_number', phoneNumber)
 
             if (!foundOtp || otp !== foundOtp?.otp?.toString()) {
-                return response.status(404).send({
+                return ctx.response.status(404).send({
                     code: 0,
                     message: 'Invalid otp !',
                     data: [],
                 })
             }
 
-            const user = await User.findOrFail(params.id)
+            const user = await User.findOrFail(ctx.params.id)
             user.phone_number = foundOtp.phone_number
             const updatedUser = await user.save()
 
-            return response.status(203).send({
+            return ctx.response.status(203).send({
                 code: 1,
                 message: 'User updated successfully !',
                 data: updatedUser
             })
 
         } catch (error) {
-            return response.status(500).send({
+            return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
                 data: []

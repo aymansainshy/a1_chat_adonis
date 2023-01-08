@@ -5,8 +5,8 @@ import otpGenerator from 'otp-generator'
 import jwt from 'jsonwebtoken'
 
 export default class LoginController {
-  public async sendOtp({ request, response }: HttpContextContract) {
-    const searchPayload = { phone_number: request.input('phone_number') }
+  public async sendOtp(ctx: HttpContextContract) {
+    const searchPayload = { phone_number: ctx.request.input('phone_number') }
 
     const generatedOtp: string = otpGenerator.generate(5, {
       digits: true,
@@ -18,22 +18,22 @@ export default class LoginController {
     console.log(generatedOtp)
 
     const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
-    return response.created({
+    return ctx.response.created({
       code: 1,
       message: 'Otp created succefully',
       data: savedOtp,
     })
   }
 
-  public async confirmOtp({ request, response }: HttpContextContract) {
-    const phoneNumber = request.input('phone_number')
-    const otp = request.input('otp')
+  public async confirmOtp(ctx: HttpContextContract) {
+    const phoneNumber = ctx.request.input('phone_number')
+    const otp = ctx.request.input('otp')
 
     try {
       const foundOtp = await Otp.findBy('phone_number', phoneNumber)
 
       if (!foundOtp || otp !== foundOtp?.otp?.toString()) {
-        return response.status(404).send({
+        return ctx.response.status(404).send({
           code: 0,
           message: 'Invalid otp !',
           data: [],
@@ -45,18 +45,16 @@ export default class LoginController {
       var token = jwt.sign({
         userId: foundedUser.id,
         phoneNumber: foundedUser.phone_number,
-      },
-          'SECRET',
-          { expiresIn: '300d' }
-      );
+      }, 'SECRET', { expiresIn: '300d' });
 
-      return response.status(201).send({
+      return ctx.response.status(201).send({
         code: 1,
         message: 'User created successfully',
-        data: {...foundedUser.$original, token : token},
+        data: { ...foundedUser.$original, token: token },
       })
+      
     } catch (error) {
-      return response.status(500).send({
+      return ctx.response.status(500).send({
         code: 0,
         message: 'Server Error !',
         data: [],
