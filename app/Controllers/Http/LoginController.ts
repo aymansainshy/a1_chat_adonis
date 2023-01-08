@@ -47,7 +47,7 @@ export default class LoginController {
         phoneNumber: foundedUser.phone_number,
       },
           'SECRET',
-          { expiresIn: '20h' }
+          { expiresIn: '300d' }
       );
 
       return response.status(201).send({
