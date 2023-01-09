@@ -18,9 +18,13 @@ export default class UsersController {
                 });
             }
 
-            var isAuthorized = ctx.userId?.toString() === user.id.toString() ;
+            var isAuthenticated = ctx.auth.isAuthenticated
+            var isAuthorized = ctx.auth.user?.id == ctx.params.id
+
+            console.log(isAuthenticated)
+            console.log(isAuthorized)
     
-            if (!isAuthorized) {
+            if (!isAuthenticated || !isAuthorized) {
                 const error = new Error('Not Authorized !')
                 return ctx.response.unauthorized({
                     code: 0,
@@ -93,9 +97,13 @@ export default class UsersController {
                 })
             }
            
-            var isAuthorized = ctx.userId?.toString() === ctx.params.id.toString()
+            var isAuthenticated = ctx.auth.isAuthenticated
+            var isAuthorized = ctx.auth.user?.id == ctx.params.id
 
-            if (!isAuthorized) {
+            console.log(isAuthenticated)
+            console.log(isAuthorized)
+
+            if (!isAuthorized || !isAuthorized) {
                 const error = new Error('Not Authorized !')
                 return ctx.response.unauthorized({
                     code: 0,

@@ -2,7 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Otp from 'App/Models/Otp'
 import User from 'App/Models/User'
 import otpGenerator from 'otp-generator'
-import jwt from 'jsonwebtoken'
+
 
 export default class LoginController {
   public async sendOtp(ctx: HttpContextContract) {
@@ -42,22 +42,22 @@ export default class LoginController {
 
       const foundedUser = await User.firstOrCreate({ phone_number: foundOtp?.phone_number })
 
-      var token = jwt.sign({
-        userId: foundedUser.id,
-        phoneNumber: foundedUser.phone_number,
-      }, 'SECRET', { expiresIn: '300d' });
+   
+      const tokenData = await ctx.auth.use('api').generate(foundedUser, {
+        expiresIn: '100 days'
+      })
 
       return ctx.response.status(201).send({
         code: 1,
         message: 'User created successfully',
-        data: { ...foundedUser.$original, token: token },
+        data: { ...foundedUser.$original, token: tokenData.token},
       })
       
     } catch (error) {
       return ctx.response.status(500).send({
         code: 0,
         message: 'Server Error !',
-        data: [],
+        data: error,
       })
     }
   }
