@@ -31,7 +31,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.put('/updatename/:id', 'UsersController.updateUserName')
-  Route.put('/update-phone/:id', 'UsersController.updataPhone')
+  Route.put('/update-phone', 'UsersController.updataPhone')
   Route.put('/confirm-mupdate-phone/:id', 'UsersController.confirmUpdatePhone')
-}).prefix('/user').middleware('isUserAuthorized')
+}).prefix('/user').middleware('authMiddleware')
 

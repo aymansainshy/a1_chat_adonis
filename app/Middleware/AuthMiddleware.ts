@@ -16,7 +16,7 @@ export default class AuthMiddlware {
         }
 
         const token = authorization.split(' ')[1]
-        
+
         var parsedToken
         try {
             // Varify if its the right Token that created by JWT and decoded it.
@@ -24,11 +24,16 @@ export default class AuthMiddlware {
             var parsedToken = JSON.parse(JSON.stringify(decodedToken))
             console.log(parsedToken.phoneNumber);
 
-        } catch {
-            const error = new Error("Not authenticated")
-            throw error;
+        } catch (error) {
+            return ctx.response.status(500).send({
+                code: 0,
+                message: 'Server error',
+                data: error
+            });
         }
-
+       
+        ctx.token = parsedToken.token
+        ctx.userId = parsedToken.userId
         await next()
     }
 }

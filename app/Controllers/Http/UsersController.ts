@@ -8,7 +8,6 @@ export default class UsersController {
 
     public async updateUserName(ctx: HttpContextContract) {
         try {
-            console.log(ctx.params.id);
             const user = await User.findOrFail(ctx.params.id)
 
             if (!user) {
@@ -16,6 +15,17 @@ export default class UsersController {
                     code: 0,
                     message: 'user not found !',
                     data: []
+                });
+            }
+
+            var isAuthorized = ctx.userId?.toString() === user.id.toString() ;
+    
+            if (!isAuthorized) {
+                const error = new Error('Not Authorized !')
+                return ctx.response.unauthorized({
+                    code: 0,
+                    error: 'Not Authorized !',
+                    data: error,
                 });
             }
 
@@ -62,7 +72,7 @@ export default class UsersController {
             return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
-                data: []
+                data: error
             });
         }
     }
@@ -81,6 +91,17 @@ export default class UsersController {
                     message: 'Invalid otp !',
                     data: [],
                 })
+            }
+           
+            var isAuthorized = ctx.userId?.toString() === ctx.params.id.toString()
+
+            if (!isAuthorized) {
+                const error = new Error('Not Authorized !')
+                return ctx.response.unauthorized({
+                    code: 0,
+                    error: 'Not Authorized !',
+                    data: error,
+                });
             }
 
             const user = await User.findOrFail(ctx.params.id)
