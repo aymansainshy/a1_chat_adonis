@@ -24,9 +24,6 @@ export default class UsersController {
             var isAuthenticated = ctx.auth.isAuthenticated
             var isAuthorized = ctx.auth.user?.id == ctx.params.id
 
-            console.log(isAuthenticated)
-            console.log(isAuthorized)
-
             if (!isAuthenticated || !isAuthorized) {
                 const error = new Error('Not Authorized !')
                 return ctx.response.unauthorized({
@@ -103,9 +100,6 @@ export default class UsersController {
             var isAuthenticated = ctx.auth.isAuthenticated
             var isAuthorized = ctx.auth.user?.id == ctx.params.id
 
-            console.log(isAuthenticated)
-            console.log(isAuthorized)
-
             if (!isAuthenticated || !isAuthorized) {
                 const error = new Error('Not Authorized !')
                 return ctx.response.unauthorized({
@@ -129,7 +123,7 @@ export default class UsersController {
             return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
-                data: []
+                data: error
             });
         }
     }
@@ -141,8 +135,8 @@ export default class UsersController {
             var isAuthenticated = ctx.auth.isAuthenticated
             var isAuthorized = ctx.auth.user?.id == ctx.params.id
 
-            console.log(isAuthenticated)
-            console.log(isAuthorized)
+            // console.log(isAuthenticated)
+            // console.log(isAuthorized)
 
             if (!isAuthenticated || !isAuthorized) {
                 const error = new Error('Not Authorized !')
