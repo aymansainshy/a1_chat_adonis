@@ -52,33 +52,34 @@ export default class UsersController {
     }
 
     public async updataPhone(ctx: HttpContextContract) {
-        try {
-            const searchPayload = { phone_number: ctx.request.input('phone_number') }
+        return this.loginController.sendOtp(ctx)
+        // try {
+        //     const searchPayload = { phone_number: ctx.request.input('phone_number') }
 
-            const generatedOtp: string = otpGenerator.generate(5, {
-                digits: true,
-                lowerCaseAlphabets: false,
-                upperCaseAlphabets: false,
-                specialChars: false,
-            })
+        //     const generatedOtp: string = otpGenerator.generate(5, {
+        //         digits: true,
+        //         lowerCaseAlphabets: false,
+        //         upperCaseAlphabets: false,
+        //         specialChars: false,
+        //     })
 
-            console.log(generatedOtp)
+        //     console.log(generatedOtp)
 
-            const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
-            return ctx.response.created({
-                code: 1,
-                message: 'Otp created succefully',
-                data: savedOtp,
-            })
+        //     const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
+        //     return ctx.response.created({
+        //         code: 1,
+        //         message: 'Otp created succefully',
+        //         data: savedOtp,
+        //     })
 
 
-        } catch (error) {
-            return ctx.response.status(500).send({
-                code: 0,
-                message: 'Server error !',
-                data: error
-            });
-        }
+        // } catch (error) {
+        //     return ctx.response.status(500).send({
+        //         code: 0,
+        //         message: 'Server error !',
+        //         data: error
+        //     });
+        // }
     }
 
 

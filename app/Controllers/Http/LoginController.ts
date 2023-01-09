@@ -7,23 +7,34 @@ import otpGenerator from 'otp-generator'
 
 export default class LoginController {
   public async sendOtp(ctx: HttpContextContract) {
-    const searchPayload = { phone_number: ctx.request.input('phone_number') }
+    try {
+      const searchPayload = { phone_number: ctx.request.input('phone_number') }
 
-    const generatedOtp: string = otpGenerator.generate(5, {
-      digits: true,
-      lowerCaseAlphabets: false,
-      upperCaseAlphabets: false,
-      specialChars: false,
-    })
+      const generatedOtp: string = otpGenerator.generate(5, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      })
 
-    console.log(generatedOtp)
+      console.log(generatedOtp)
 
-    const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
-    return ctx.response.created({
-      code: 1,
-      message: 'Otp created succefully',
-      data: savedOtp,
-    })
+      const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
+      return ctx.response.created(
+        new ResponseData(
+          1,
+          'Otp created succefully1',
+          savedOtp
+        ),
+      )
+      
+    } catch (error) {
+      return ctx.response.status(500).send({
+        code: 0,
+        message: 'Server error !',
+        data: error
+      });
+    }
   }
 
   public async confirmOtp(ctx: HttpContextContract) {
