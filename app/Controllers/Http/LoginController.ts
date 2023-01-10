@@ -1,14 +1,12 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Env from '@ioc:Adonis/Core/Env'
 import Otp from 'App/Models/Otp'
 import User from 'App/Models/User'
 import ResponseData from 'App/helper/ResposeData'
 import otpGenerator from 'otp-generator'
 import axios from 'axios'
+import getSmsUrl from 'App/helper/SmsUrl'
 
-const SENDER_ID = Env.get('SENDER_ID');
-const PASSWORD = Env.get('PASSWORD');
-const USER_NAME = Env.get('USER_NAME');
+
 
 export default class LoginController {
   public async sendOtp(ctx: HttpContextContract) {
@@ -26,8 +24,7 @@ export default class LoginController {
 
       const savedOtp = await Otp.updateOrCreate(searchedPylod, { otp: generatedOtp })
 
-      const url = `http://sms.nilogy.com/app/gateway/gateway.php?sendmessage=1&username=${USER_NAME}&password=${PASSWORD}&text=${generatedOtp}&numbers=${phoneNumber}&sender=${SENDER_ID}`
-
+      const url = getSmsUrl(generatedOtp, phoneNumber)
       await axios.get(url)
 
       return ctx.response.created({
