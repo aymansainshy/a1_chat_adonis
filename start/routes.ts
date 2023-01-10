@@ -33,5 +33,6 @@ Route.group(() => {
   Route.put('/updatename/:id', 'UsersController.updateUserName')
   Route.put('/update-phone', 'UsersController.updataPhone')
   Route.put('/confirm-mupdate-phone/:id', 'UsersController.confirmUpdatePhone')
+  Route.post('/update-image/:id', 'UsersController.updateImge')
 }).prefix('/user').middleware('auth')
 
