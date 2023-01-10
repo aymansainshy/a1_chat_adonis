@@ -1,14 +1,21 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Env from '@ioc:Adonis/Core/Env'
 import Otp from 'App/Models/Otp'
 import User from 'App/Models/User'
 import ResponseData from 'App/helper/ResposeData'
 import otpGenerator from 'otp-generator'
+import axios from 'axios'
 
+const SENDER_ID = Env.get('SENDER_ID');
+const PASSWORD = Env.get('PASSWORD');
+const USER_NAME = Env.get('USER_NAME');
 
 export default class LoginController {
   public async sendOtp(ctx: HttpContextContract) {
     try {
-      const searchPayload = { phone_number: ctx.request.input('phone_number') }
+      const searchedPylod = { phone_number: ctx.request.input('phone_number') }
+      const phoneNumber = ctx.request.input('phone_number')
+
 
       const generatedOtp: string = otpGenerator.generate(5, {
         digits: true,
@@ -17,17 +24,18 @@ export default class LoginController {
         specialChars: false,
       })
 
-      console.log(generatedOtp)
+      const savedOtp = await Otp.updateOrCreate(searchedPylod, { otp: generatedOtp })
 
-      const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
-      return ctx.response.created(
-        new ResponseData(
-          1,
-          'Otp created succefully1',
-          savedOtp
-        ),
-      )
-      
+      const url = `http://sms.nilogy.com/app/gateway/gateway.php?sendmessage=1&username=${USER_NAME}&password=${PASSWORD}&text=${generatedOtp}&numbers=${phoneNumber}&sender=${SENDER_ID}`
+
+      await axios.get(url)
+
+      return ctx.response.created({
+        code: 1,
+        message: 'Otp created succefully1',
+        data: savedOtp
+      })
+
     } catch (error) {
       return ctx.response.status(500).send({
         code: 0,
