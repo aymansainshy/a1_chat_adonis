@@ -48,7 +48,7 @@ export default class LoginController {
         return ctx.response.status(404).send({
           code: 0,
           message: 'Invalid otp !',
-          data: [],
+          data: {},
         })
       }
 

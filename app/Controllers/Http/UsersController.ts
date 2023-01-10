@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import LoginController from './LoginController'
-import otpGenerator from 'otp-generator'
 import Otp from 'App/Models/Otp'
 
 
@@ -46,40 +45,13 @@ export default class UsersController {
             return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
-                data: []
+                data: {}
             });
         }
     }
 
     public async updataPhone(ctx: HttpContextContract) {
         return this.loginController.sendOtp(ctx)
-        // try {
-        //     const searchPayload = { phone_number: ctx.request.input('phone_number') }
-
-        //     const generatedOtp: string = otpGenerator.generate(5, {
-        //         digits: true,
-        //         lowerCaseAlphabets: false,
-        //         upperCaseAlphabets: false,
-        //         specialChars: false,
-        //     })
-
-        //     console.log(generatedOtp)
-
-        //     const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
-        //     return ctx.response.created({
-        //         code: 1,
-        //         message: 'Otp created succefully',
-        //         data: savedOtp,
-        //     })
-
-
-        // } catch (error) {
-        //     return ctx.response.status(500).send({
-        //         code: 0,
-        //         message: 'Server error !',
-        //         data: error
-        //     });
-        // }
     }
 
 

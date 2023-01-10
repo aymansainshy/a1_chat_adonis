@@ -27,7 +27,7 @@ Route.get('/', () => {
 Route.group(() => {
   Route.post('/', 'LoginController.sendOtp')
   Route.post('/confirmotp', 'LoginController.confirmOtp')
-}).prefix('/login')
+}).prefix('/login').middleware('loginValidator')
 
 Route.group(() => {
   Route.put('/updatename/:id', 'UsersController.updateUserName')
