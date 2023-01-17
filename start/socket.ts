@@ -8,7 +8,8 @@ Ws.boot()
 Ws.io?.on('connection', (socket) => {
   socket.emit('news', { hello: 'world' })
 
-  socket.on('my other event', (data) => {
-    console.log(data)
+  socket.on('send-message', (data) => {
+    console.log(data.content)
+    console.log(data.sender.phoneNumber)
   })
 })

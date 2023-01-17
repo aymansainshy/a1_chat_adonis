@@ -1,14 +1,15 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Otp from 'App/Models/Otp'
 import User from 'App/Models/User'
-import ResponseData from 'App/helper/ResposeData'
 import otpGenerator from 'otp-generator'
+import axios from 'axios'
+import getSmsUrl from 'App/helper/SmsUrl'
 
+let otpContainer = new Map<string, any>()
 
 export default class LoginController {
   public async sendOtp(ctx: HttpContextContract) {
     try {
-      const searchPayload = { phone_number: ctx.request.input('phone_number') }
+      const phoneNumber = ctx.request.input('phone_number')
 
       const generatedOtp: string = otpGenerator.generate(5, {
         digits: true,
@@ -17,17 +18,20 @@ export default class LoginController {
         specialChars: false,
       })
 
-      console.log(generatedOtp)
+      otpContainer.set(phoneNumber, {
+        otp: generatedOtp,
+        phoneNumber: phoneNumber,
+      })
 
-      const savedOtp = await Otp.updateOrCreate(searchPayload, { otp: generatedOtp })
-      return ctx.response.created(
-        new ResponseData(
-          1,
-          'Otp created succefully1',
-          savedOtp
-        ),
-      )
-      
+      const url = getSmsUrl(generatedOtp, phoneNumber)
+      await axios.get(url)
+
+      return ctx.response.created({
+        code: 1,
+        message: 'Otp created succefully1',
+        data: generatedOtp
+      })
+
     } catch (error) {
       return ctx.response.status(500).send({
         code: 0,
@@ -38,41 +42,43 @@ export default class LoginController {
   }
 
   public async confirmOtp(ctx: HttpContextContract) {
-    const phoneNumber = ctx.request.input('phone_number')
-    const otp = ctx.request.input('otp')
+    const phoneNumber: string = ctx.request.input('phone_number')
+    const otp: string = ctx.request.input('otp')
 
     try {
-      const foundOtp = await Otp.findBy('phone_number', phoneNumber)
+      let foundOtp
 
-      if (!foundOtp || otp !== foundOtp?.otp?.toString()) {
+      if (otpContainer.has(phoneNumber)) {
+        foundOtp = otpContainer.get(phoneNumber)
+        otpContainer.delete(phoneNumber)
+
+      } else {
         return ctx.response.status(404).send({
           code: 0,
           message: 'Invalid otp !',
-          data: [],
+          data: {},
         })
       }
 
-      const foundedUser = await User.firstOrCreate({ phone_number: foundOtp?.phone_number })
+      if (otp !== foundOtp.otp) {
+        return ctx.response.status(404).send({
+          code: 0,
+          message: 'Invalid otp !',
+          data: {},
+        })
+      }
 
+      const foundedUser = await User.firstOrCreate({ phone_number: foundOtp?.phoneNumber })
 
       const tokenData = await ctx.auth.use('api').generate(foundedUser, {
         expiresIn: '100 days'
       })
 
-      return ctx.response.status(201).send(
-        new ResponseData(
-          1,
-          ' User created successfully',
-          { ...foundedUser.$original, token: tokenData.token },
-        )
-
-        //   {
-        //   code: 1,
-        //   message: 'User created successfully',
-        //   data: { ...foundedUser.$original, token: tokenData.token},
-        // }
-
-      )
+      return ctx.response.status(201).send({
+        code: 1,
+        message: 'User created successfully',
+        data: { ...foundedUser.$original, token: tokenData.token },
+      })
 
     } catch (error) {
       return ctx.response.status(500).send({
