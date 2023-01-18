@@ -1,10 +1,10 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import LoginController from './LoginController'
-import Otp from 'App/Models/Otp'
 
+import container from 'App/helper/otp_container'
 
-
+let otpContainer = container()
 export default class UsersController {
     loginController: LoginController = new LoginController()
 
@@ -60,15 +60,37 @@ export default class UsersController {
         const otp = ctx.request.input('otp')
 
         try {
-            const foundOtp = await Otp.findBy('phone_number', phoneNumber)
 
-            if (!foundOtp || otp !== foundOtp?.otp?.toString()) {
+            let foundOtp
+
+            if (otpContainer.has(phoneNumber)) {
+                foundOtp = otpContainer.get(phoneNumber)
+                otpContainer.delete(phoneNumber)
+
+            } else {
                 return ctx.response.status(404).send({
                     code: 0,
                     message: 'Invalid otp !',
-                    data: [],
+                    data: {},
                 })
             }
+
+            if (otp !== foundOtp.otp) {
+                return ctx.response.status(404).send({
+                    code: 0,
+                    message: 'Invalid otp !',
+                    data: {},
+                })
+            }
+            // const foundOtp = await Otp.findBy('phone_number', phoneNumber)
+
+            // if (!foundOtp || otp !== foundOtp?.otp?.toString()) {
+            //     return ctx.response.status(404).send({
+            //         code: 0,
+            //         message: 'Invalid otp !',
+            //         data: [],
+            //     })
+            // }
 
             var isAuthenticated = ctx.auth.isAuthenticated
             var isAuthorized = ctx.auth.user?.id == ctx.params.id
@@ -122,7 +144,7 @@ export default class UsersController {
 
             const image = ctx.request.file('image', {
                 size: '2mb',
-                extnames: ['jpg', 'png', 'gif'],
+                extnames: ['jpg', 'png', 'gif', 'jpeg'],
             })
 
             const user = await User.findOrFail(ctx.params.id)
