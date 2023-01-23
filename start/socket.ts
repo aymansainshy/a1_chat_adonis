@@ -13,24 +13,29 @@ Ws.io?.on('connection', (socket) => {
 
   
   socket.on('user-data' , (data) => {
-    container.set( data.user.id , {...data.user, socketId: socket.id })
+    container.set( data.user.phoneNumber , {...data.user, socketId: socket.id })
 
     console.log(socket.id)
     // console.log(container);
 
-    socket.broadcast.emit('online-user', container.get(data.user.id))
+    socket.broadcast.emit('online-user', container.get(data.user.phoneNumber))
   })
+
+
+
 
   socket.on('send-message', (data) => {
 
     console.log(data)
     console.log(data.sender.phoneNumber)
     
-    const user = container.get(data.receiver.id)
+    const user = container.get(data.receiver.phoneNumber)
     
     console.log(user.socketId)
     socket.to(user.socketId).emit('message', data)
   })
+
+
 
 
   socket.on('disconnected-user-data', (user) => {
@@ -40,6 +45,7 @@ Ws.io?.on('connection', (socket) => {
     container.delete(user.id);
   })
 
+  
 
   socket.on('disconnect' ,() => {
     console.log('DisConnected')
