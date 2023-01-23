@@ -22,8 +22,14 @@ Ws.io?.on('connection', (socket) => {
   })
 
   socket.on('send-message', (data) => {
-    console.log(data.content)
+
+    console.log(data)
     console.log(data.sender.phoneNumber)
+    
+    const user = container.get(data.receiver.id)
+    
+    console.log(user.socketId)
+    socket.to(user.socketId).emit('message', data)
   })
 
 
