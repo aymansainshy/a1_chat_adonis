@@ -3,12 +3,14 @@ import User from 'App/Models/User'
 import otpGenerator from 'otp-generator'
 import axios from 'axios'
 import getSmsUrl from 'App/helper/SmsUrl'
+import container from 'App/helper/otp_container'
 
-let otpContainer = new Map<string, any>()
-
+let otpContainer = container()
 export default class LoginController {
   public async sendOtp(ctx: HttpContextContract) {
     try {
+   
+
       const phoneNumber = ctx.request.input('phone_number')
 
       const generatedOtp: string = otpGenerator.generate(5, {
