@@ -27,6 +27,7 @@ Ws.io?.on('connection', (socket) => {
     socket.emit('message-success', data)
 
     if (!receiver) {
+      // Save message to Redis Storage - receiver well pull messages later .
       return
     }
     socket.to(receiver.socketId).emit('message', data)
