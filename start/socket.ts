@@ -3,33 +3,28 @@ import Ws from '../app/Services/Ws'
 Ws.boot()
 
 
-let container = socketContainer();
+let onlineUser = socketContainer();
 
-/**
- * Listen for incoming socket connections
- */
 
 Ws.io?.on('connection', (socket) => {
 
-
   socket.on('user-data', (data) => {
-    container.set(data.user.phoneNumber, { ...data.user, socketId: socket.id })
+    onlineUser.set(data.user.phoneNumber, { ...data.user, socketId: socket.id })
 
-    console.log(socket.id)
-    // console.log(container);
-    socket.broadcast.emit('online-user', container.get(data.user.phoneNumber))
+    socket.broadcast.emit('online-user', onlineUser.get(data.user.phoneNumber))
   })
 
 
 
 
   socket.on('send-message', (data) => {
-    const receiver = container.get(data.receiver.phoneNumber)
-    // const sender = container.get(data.sender.phoneNumber)
+    const receiver = onlineUser.get(data.receiver.phoneNumber)
+    // const sender = onlineUser.get(data.sender.phoneNumber)
 
     socket.emit('message-success', data)
 
-    if(!receiver){
+    if (!receiver) {
+      // Save message to Redis Storage - receiver well pull messages later .
       return
     }
     socket.to(receiver.socketId).emit('message', data)
@@ -42,24 +37,19 @@ Ws.io?.on('connection', (socket) => {
     if (!data) {
       return
     }
-    console.log("message Deliverd");
-    console.log(data)
-    console.log(data.sender.phoneNumber)
-    const sender = container.get(data.sender.phoneNumber)
+
+    const sender = onlineUser.get(data.sender.phoneNumber)
+
     if (!sender) {
       return
     }
-
-    // const receiver = container.get(data.receiver.phoneNumber)
-
-    // console.log(receiver.socketId)
 
     socket.to(sender.socketId).emit('message-delivered', data)
   })
 
 
 
-  
+
   socket.on('iread-message', (data) => {
     if (!data) {
       return
@@ -68,8 +58,8 @@ Ws.io?.on('connection', (socket) => {
     console.log(data.senderPhone)
     console.log(data.recieverPhone)
 
-    // const sender = container.get(data.sender.phoneNumber)
-    const receiver = container.get(data.recieverPhone)
+    // const sender = onlineUser.get(data.sender.phoneNumber)
+    const receiver = onlineUser.get(data.recieverPhone)
 
     if (!receiver) {
       return
@@ -85,7 +75,7 @@ Ws.io?.on('connection', (socket) => {
     console.log('DisConnected.....')
     console.log(user)
 
-    container.delete(user.id);
+    onlineUser.delete(user.id);
   })
 
 
