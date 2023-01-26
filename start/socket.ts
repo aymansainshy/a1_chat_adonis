@@ -5,9 +5,6 @@ Ws.boot()
 
 let onlineUser = socketContainer();
 
-/**
- * Listen for incoming socket connections
- */
 
 Ws.io?.on('connection', (socket) => {
 
