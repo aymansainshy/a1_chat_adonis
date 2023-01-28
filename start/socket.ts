@@ -17,7 +17,7 @@ Ws.io?.on('connection', (socket) => {
 
 
 
-  socket.on('send-message', (data) => {
+  socket.on('send-text-message', (data) => {
     const receiver = onlineUser.get(data.receiver.phoneNumber)
     // const sender = onlineUser.get(data.sender.phoneNumber)
 
@@ -27,7 +27,7 @@ Ws.io?.on('connection', (socket) => {
       // Save message to Redis Storage - receiver well pull messages later .
       return
     }
-    socket.to(receiver.socketId).emit('message', data)
+    socket.to(receiver.socketId).emit('send-text-message', data)
   })
 
 
@@ -71,7 +71,7 @@ Ws.io?.on('connection', (socket) => {
 
 
 
-  socket.on('disconnected-user-data', (user) => {
+  socket.on('disconnected-user', (user) => {
     console.log('DisConnected.....')
     console.log(user)
 
