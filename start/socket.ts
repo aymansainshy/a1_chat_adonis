@@ -8,10 +8,10 @@ let onlineUser = socketContainer();
 
 Ws.io?.on('connection', (socket) => {
 
-  socket.on('user-data', (data) => {
+  socket.on('user-connected', (data) => {
     onlineUser.set(data.user.phoneNumber, { ...data.user, socketId: socket.id })
 
-    socket.broadcast.emit('online-user', onlineUser.get(data.user.phoneNumber))
+    socket.broadcast.emit('user-connected', onlineUser.get(data.user.phoneNumber))
   })
 
 
@@ -54,33 +54,36 @@ Ws.io?.on('connection', (socket) => {
     if (!data) {
       return
     }
-    console.log("message-read");
-    console.log(data.senderPhone)
-    console.log(data.recieverPhone)
-
+    
+    const sender = onlineUser.get(data.sender.phoneNumber)
     // const sender = onlineUser.get(data.sender.phoneNumber)
-    const receiver = onlineUser.get(data.recieverPhone)
 
-    if (!receiver) {
+
+    if (!sender) {
+      // Save message to Redis Storage - sender well pull messages later .
       return
     }
-    // console.log(receiver.socketId)
-    socket.to(receiver.socketId).emit('message-read', data.senderPhone)
+   
+    // console.log(sender.socketId)
+    socket.to(sender.socketId).emit('message-read', data)
   })
 
-
-
-
-  socket.on('disconnected-user', (user) => {
-    console.log('DisConnected.....')
-    console.log(user)
-
-    onlineUser.delete(user.id);
-  })
 
 
 
   socket.on('disconnect', () => {
-    console.log('DisConnected')
+    
+    var users = Array.from(onlineUser.values()) 
+   
+    const index = users.findIndex(user => user.socketId == socket.id);
+   
+    let disConnectedUser 
+
+    if (index !== -1) {
+      onlineUser.delete(users[index].phoneNumber)
+      disConnectedUser = users.splice(index, 1)[0];
+    }
+
+    Ws.io?.emit('disconnected-user', disConnectedUser)
   })
 })
