@@ -12,6 +12,8 @@ Ws.io?.on('connection', (socket) => {
     onlineUser.set(data.user.phoneNumber, { ...data.user, socketId: socket.id })
 
     socket.broadcast.emit('user-connected', onlineUser.get(data.user.phoneNumber))
+
+    // Fetch messed event releated to connected user.
   })
 
 
@@ -19,7 +21,6 @@ Ws.io?.on('connection', (socket) => {
 
   socket.on('send-text-message', (data) => {
     const receiver = onlineUser.get(data.receiver.phoneNumber)
-    // const sender = onlineUser.get(data.sender.phoneNumber)
 
     socket.emit('message-success', data)
 
@@ -41,6 +42,7 @@ Ws.io?.on('connection', (socket) => {
     const sender = onlineUser.get(data.sender.phoneNumber)
 
     if (!sender) {
+      // Save message status to Redis Storage - sender well pull messages status later .
       return
     }
 
@@ -56,15 +58,12 @@ Ws.io?.on('connection', (socket) => {
     }
     
     const sender = onlineUser.get(data.sender.phoneNumber)
-    // const sender = onlineUser.get(data.sender.phoneNumber)
-
 
     if (!sender) {
-      // Save message to Redis Storage - sender well pull messages later .
+      // Save message status to Redis Storage - sender well pull messages status later .
       return
     }
    
-    // console.log(sender.socketId)
     socket.to(sender.socketId).emit('message-read', data)
   })
 
@@ -72,7 +71,7 @@ Ws.io?.on('connection', (socket) => {
 
 
   socket.on('disconnect', () => {
-    
+
     var users = Array.from(onlineUser.values()) 
    
     const index = users.findIndex(user => user.socketId == socket.id);
