@@ -6,11 +6,12 @@ export default class UserSeeder extends BaseSeeder {
     await User.createMany([
       {
         name: 'Ayman',
-        phone_number: '+249924081893',
+        phone_number: '+249917727266',
+        image_Url: 'cld1u7kq50001dxlq3dn81kq6.jpeg',
       },
       {
-        name: 'sohaib',
-        phone_number: '+249912345678',
+        phone_number: '+249924081893',
+        image_Url: 'clcow8vds0001ialq2gy652v6.png',
       },
     ])
   }

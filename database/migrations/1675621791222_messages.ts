@@ -1,20 +1,23 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class User extends BaseSchema {
-  protected tableName = 'users'
+export default class Message extends BaseSchema {
+  protected tableName = 'messages'
 
-  public async up() {
+  public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.string('name').defaultTo('')
-      table.string('phone_number')
-      table.string('image_url').defaultTo('')
+
+      table.boolean('isRead')
+      table.boolean('isReceive')
+      table.boolean('isDelivered')
+      table.boolean('isNew')
+
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
   }
 
-  public async down() {
+  public async down () {
     this.schema.dropTable(this.tableName)
   }
 }

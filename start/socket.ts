@@ -8,18 +8,19 @@ let onlineUser = socketContainer();
 
 Ws.io?.on('connection', (socket) => {
 
-  socket.on('user-data', (data) => {
+  socket.on('user-connected', (data) => {
     onlineUser.set(data.user.phoneNumber, { ...data.user, socketId: socket.id })
 
-    socket.broadcast.emit('online-user', onlineUser.get(data.user.phoneNumber))
+    socket.broadcast.emit('user-connected', onlineUser.get(data.user.phoneNumber))
+
+    // Fetch messed event releated to connected user.
   })
 
 
 
 
-  socket.on('send-message', (data) => {
+  socket.on('send-text-message', (data) => {
     const receiver = onlineUser.get(data.receiver.phoneNumber)
-    // const sender = onlineUser.get(data.sender.phoneNumber)
 
     socket.emit('message-success', data)
 
@@ -27,7 +28,7 @@ Ws.io?.on('connection', (socket) => {
       // Save message to Redis Storage - receiver well pull messages later .
       return
     }
-    socket.to(receiver.socketId).emit('message', data)
+    socket.to(receiver.socketId).emit('send-text-message', data)
   })
 
 
@@ -41,6 +42,7 @@ Ws.io?.on('connection', (socket) => {
     const sender = onlineUser.get(data.sender.phoneNumber)
 
     if (!sender) {
+      // Save message status to Redis Storage - sender well pull messages status later .
       return
     }
 
@@ -54,33 +56,33 @@ Ws.io?.on('connection', (socket) => {
     if (!data) {
       return
     }
-    console.log("message-read");
-    console.log(data.senderPhone)
-    console.log(data.recieverPhone)
+    
+    const sender = onlineUser.get(data.sender.phoneNumber)
 
-    // const sender = onlineUser.get(data.sender.phoneNumber)
-    const receiver = onlineUser.get(data.recieverPhone)
-
-    if (!receiver) {
+    if (!sender) {
+      // Save message status to Redis Storage - sender well pull messages status later .
       return
     }
-    // console.log(receiver.socketId)
-    socket.to(receiver.socketId).emit('message-read', data.senderPhone)
+   
+    socket.to(sender.socketId).emit('message-read', data)
   })
 
-
-
-
-  socket.on('disconnected-user-data', (user) => {
-    console.log('DisConnected.....')
-    console.log(user)
-
-    onlineUser.delete(user.id);
-  })
 
 
 
   socket.on('disconnect', () => {
-    console.log('DisConnected')
+
+    var users = Array.from(onlineUser.values()) 
+   
+    const index = users.findIndex(user => user.socketId == socket.id);
+   
+    let disConnectedUser 
+
+    if (index !== -1) {
+      onlineUser.delete(users[index].phoneNumber)
+      disConnectedUser = users.splice(index, 1)[0];
+    }
+
+    Ws.io?.emit('disconnected-user', disConnectedUser)
   })
 })
