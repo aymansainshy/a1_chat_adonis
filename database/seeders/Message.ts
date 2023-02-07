@@ -6,7 +6,7 @@ export default class MessageSeeder extends BaseSeeder {
     await Message.createMany([
       {
         is_read: false,
-        is_receive: false,
+        is_success: false,
         is_delivered: true,
         is_new: true,
         sender: 1,
@@ -14,7 +14,7 @@ export default class MessageSeeder extends BaseSeeder {
       },
       {
         is_read: false,
-        is_receive: false,
+        is_success: false,
         is_delivered: false,
         is_new: true,
         sender: 2,

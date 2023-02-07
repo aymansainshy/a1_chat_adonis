@@ -11,7 +11,7 @@ export default class Message extends BaseSchema {
       table.integer('receiver').unsigned().nullable().references('id').inTable('users').onDelete('CASCADE')
       
       table.boolean('is_read')
-      table.boolean('is_receive')
+      table.boolean('is_success')
       table.boolean('is_delivered')
       table.boolean('is_new')
 

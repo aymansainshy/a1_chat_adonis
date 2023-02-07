@@ -10,7 +10,7 @@ export default class Message extends BaseModel {
   public is_read?: boolean
 
   @column()
-  public is_receive?: boolean
+  public is_success?: boolean
 
   @column()
   public is_delivered?: boolean

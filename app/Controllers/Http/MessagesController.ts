@@ -9,23 +9,43 @@ export default class MessagesController {
         console.log(message)
 
         try {
-            const searchedPayload = { id: message.id }
-            const persistancePayload = {
+
+            const messageData = {
                 is_read: message.is_read,
-                is_receive: message.is_receive,
+                is_success: message.is_success,
                 is_delivered: message.is_delivered,
                 is_new: message.is_new,
                 sender: message.sender.id,
                 receiver: message.receiver.id,
             }
 
-            const updatedMessage = await Message.updateOrCreate(searchedPayload, persistancePayload)
+            const foundedMessage = await Message.find(message.id);
+            if (foundedMessage) {
 
-            const cSearchedPayload = { message_id: updatedMessage.id }
-            const cPersistancePayload = { content: message.content }
-            await MContent.updateOrCreate(cSearchedPayload, cPersistancePayload)
+                foundedMessage.is_read = message.is_read,
+                    foundedMessage.is_success = message.is_success,
+                    foundedMessage.is_delivered = message.is_delivered,
+                    foundedMessage.is_new = message.is_new,
+                    foundedMessage.sender = message.sender.id,
+                    foundedMessage.receiver = message.receiver.id,
 
-            console.log("Message Created Successfully")
+                    await foundedMessage.save()
+
+                    console.log("Message Updated Successfully")
+            } else {
+                const newMessage = await Message.create(messageData);
+
+                await MContent.create({
+                    message_id: newMessage.id,
+                    content: message.content,
+                })
+
+                console.log("Message Created Successfully")
+
+            }
+
+
+           
 
         } catch (error) {
             console.log(error)
