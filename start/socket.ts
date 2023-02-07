@@ -1,9 +1,12 @@
 import socketContainer from 'App/helper/OnlineUserContainer'
 import Ws from '../app/Services/Ws'
+import MessagesController from 'App/Controllers/Http/MessagesController';
 Ws.boot()
 
 
 let onlineUser = socketContainer();
+
+const messagesController = new MessagesController()
 
 
 Ws.io?.on('connection', (socket) => {
@@ -19,52 +22,53 @@ Ws.io?.on('connection', (socket) => {
 
 
 
-  socket.on('send-text-message', (data) => {
-    const receiver = onlineUser.get(data.receiver.phoneNumber)
+  socket.on('send-text-message', async (message) => {
+    const receiver = onlineUser.get(message.receiver.phoneNumber)
 
-    socket.emit('message-success', data)
+    socket.emit('message-success', message)
 
     if (!receiver) {
-      // Save message to Redis Storage - receiver well pull messages later .
+      // Save message to DB Storage - receiver well pull messages later .
+      await messagesController.saveMessage(message)
       return
     }
-    socket.to(receiver.socketId).emit('send-text-message', data)
+    socket.to(receiver.socketId).emit('send-text-message', message)
   })
 
 
 
 
-  socket.on('message-delivered', (data) => {
-    if (!data) {
+  socket.on('message-delivered', (message) => {
+    if (!message) {
       return
     }
 
-    const sender = onlineUser.get(data.sender.phoneNumber)
+    const sender = onlineUser.get(message.sender.phoneNumber)
 
     if (!sender) {
       // Save message status to Redis Storage - sender well pull messages status later .
       return
     }
 
-    socket.to(sender.socketId).emit('message-delivered', data)
+    socket.to(sender.socketId).emit('message-delivered', message)
   })
 
 
 
 
-  socket.on('iread-message', (data) => {
-    if (!data) {
+  socket.on('iread-message', (message) => {
+    if (!message) {
       return
     }
-    
-    const sender = onlineUser.get(data.sender.phoneNumber)
+
+    const sender = onlineUser.get(message.sender.phoneNumber)
 
     if (!sender) {
       // Save message status to Redis Storage - sender well pull messages status later .
       return
     }
-   
-    socket.to(sender.socketId).emit('message-read', data)
+
+    socket.to(sender.socketId).emit('message-read', message)
   })
 
 
@@ -72,11 +76,11 @@ Ws.io?.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
 
-    var users = Array.from(onlineUser.values()) 
-   
+    var users = Array.from(onlineUser.values())
+
     const index = users.findIndex(user => user.socketId == socket.id);
-   
-    let disConnectedUser 
+
+    let disConnectedUser
 
     if (index !== -1) {
       onlineUser.delete(users[index].phoneNumber)
