@@ -7,6 +7,9 @@ export default class Message extends BaseModel {
   public id!: number
 
   @column()
+  public uuid?: string
+
+  @column()
   public is_read?: boolean
 
   @column()

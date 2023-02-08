@@ -6,14 +6,15 @@ export default class Message extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
+      table.string('uuid').notNullable()
 
-      table.integer('sender').unsigned().nullable().references('id').inTable('users').onDelete('CASCADE')
-      table.integer('receiver').unsigned().nullable().references('id').inTable('users').onDelete('CASCADE')
+      table.integer('sender').unsigned().notNullable().references('id').inTable('users').onDelete('CASCADE')
+      table.integer('receiver').unsigned().notNullable().references('id').inTable('users').onDelete('CASCADE')
       
-      table.boolean('is_read')
-      table.boolean('is_success')
-      table.boolean('is_delivered')
-      table.boolean('is_new')
+      table.boolean('is_read').notNullable()
+      table.boolean('is_success').notNullable()
+      table.boolean('is_delivered').notNullable()
+      table.boolean('is_new').notNullable()
 
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })

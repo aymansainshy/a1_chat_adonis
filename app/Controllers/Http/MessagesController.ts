@@ -9,9 +9,9 @@ export default class MessagesController {
         console.log(message)
 
         try {
-
             const messageData = {
                 is_read: message.is_read,
+                uuid: message.uuid,
                 is_success: message.is_success,
                 is_delivered: message.is_delivered,
                 is_new: message.is_new,
@@ -21,8 +21,8 @@ export default class MessagesController {
 
             const foundedMessage = await Message.find(message.id);
             if (foundedMessage) {
-
-                foundedMessage.is_read = message.is_read,
+                foundedMessage.uuid = message.uuid,
+                    foundedMessage.is_read = message.is_read,
                     foundedMessage.is_success = message.is_success,
                     foundedMessage.is_delivered = message.is_delivered,
                     foundedMessage.is_new = message.is_new,
@@ -31,7 +31,7 @@ export default class MessagesController {
 
                     await foundedMessage.save()
 
-                    console.log("Message Updated Successfully")
+                console.log("Message Updated Successfully")
             } else {
                 const newMessage = await Message.create(messageData);
 
@@ -41,11 +41,7 @@ export default class MessagesController {
                 })
 
                 console.log("Message Created Successfully")
-
             }
-
-
-           
 
         } catch (error) {
             console.log(error)
