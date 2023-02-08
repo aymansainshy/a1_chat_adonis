@@ -20,9 +20,7 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', () => {
-  return { hello: 'world' }
-})
+Route.get('/', 'MessagesController.getMessages')
 
 Route.group(() => {
   Route.post('/', 'LoginController.sendOtp')
