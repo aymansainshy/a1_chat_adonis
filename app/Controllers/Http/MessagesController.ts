@@ -9,6 +9,7 @@ export default class MessagesController {
         console.log(message)
 
         try {
+            // This part for the reciever to update message status .
             const messageData = {
                 is_read: message.is_read,
                 uuid: message.uuid,
@@ -33,6 +34,7 @@ export default class MessagesController {
 
                 console.log("Message Updated Successfully")
             } else {
+                // This part for the sender to save message when the reciever not connected .
                 const newMessage = await Message.create(messageData);
 
                 await MContent.create({
