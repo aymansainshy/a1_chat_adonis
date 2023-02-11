@@ -9,14 +9,34 @@ export default class Message extends BaseModel {
   @column()
   public uuid?: string
 
-  @column()
+  @column({
+    serialize: (value?: Number) => {
+      return Boolean(value)
+    },
+  })
   public is_read?: boolean
 
-  @column()
+  @column({
+    serialize: (value?: Number) => {
+      return Boolean(value)
+    },
+  })
   public is_success?: boolean
 
-  @column()
+  @column({
+    serialize: (value?: Number) => {
+      return Boolean(value)
+    },
+  })
   public is_delivered?: boolean
+
+
+  @column({
+    serialize: (value?: Number) => {
+      return Boolean(value)
+    },
+  })
+  public is_new?: boolean
 
   @column()
   public sender?: number
@@ -24,8 +44,6 @@ export default class Message extends BaseModel {
   @column()
   public receiver?: number
 
-  @column()
-  public is_new?: boolean
 
   @column.dateTime({ autoCreate: true })
   public createdAt!: DateTime
@@ -33,8 +51,8 @@ export default class Message extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt!: DateTime
 
-  @hasOne(() => MContent , {
-    foreignKey : 'message_id'
+  @hasOne(() => MContent, {
+    foreignKey: 'message_id'
   })
   public content!: HasOne<typeof MContent>
 }
