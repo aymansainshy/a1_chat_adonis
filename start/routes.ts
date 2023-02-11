@@ -20,7 +20,7 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', 'MessagesController.getMessages')
+
 
 Route.group(() => {
   Route.post('/', 'LoginController.sendOtp')
@@ -36,3 +36,4 @@ Route.group(() => {
   Route.post('/update-image/:id', 'UsersController.updateImge')
 }).prefix('/user').middleware('auth')
 
+Route.get('/user-messages/:id', 'MessagesController.getUserMessages').middleware('auth')
