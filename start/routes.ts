@@ -36,4 +36,7 @@ Route.group(() => {
   Route.post('/update-image/:id', 'UsersController.updateImge')
 }).prefix('/user').middleware('auth')
 
+
+Route.get('/user-received-messages/:id', 'MessagesController.getUserReceivedMessages').middleware('auth')
 Route.get('/user-messages/:id', 'MessagesController.getUserMessages').middleware('auth')
+
