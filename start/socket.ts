@@ -15,15 +15,6 @@ Ws.io?.on('connection', (socket) => {
     onlineUser.set(data.user.phone_number, { ...data.user, socketId: socket.id })
 
     socket.broadcast.emit('user-connected', onlineUser.get(data.user.phone_number))
-
-    // // Fetch messed event releated to connected user.
-    // const userMessage = await messagesController.userReceivedMessages(data.user.id);
-    
-    // for (var message in userMessage) {
-    //   console.log(message)
-    //   console.log('=========================================')
-    //   socket.to(socket.id).emit('send-text-message', message)
-    // }
   })
 
 
@@ -31,12 +22,12 @@ Ws.io?.on('connection', (socket) => {
 
   socket.on('send-text-message', async (message) => {
     const receiver = onlineUser.get(message.receiver.phone_number)
-    console.log(message);
 
     socket.emit('message-success', message)
 
     if (!receiver) {
       // Save message to DB Storage - receiver well pull messages later .
+      message.is_success = true
       await messagesController.saveMessage(message)
       return
     }
@@ -46,16 +37,15 @@ Ws.io?.on('connection', (socket) => {
 
 
 
-  socket.on('message-delivered', (message) => {
+  socket.on('message-delivered', async (message) => {
     if (!message) {
       return
     }
-
     const sender = onlineUser.get(message.sender.phone_number)
-   
+
     if (!sender) {
-      messagesController.saveMessage(message)
       // Save message status to Redis Storage - sender well pull messages status later .
+      await messagesController.saveMessage(message)
       return
     }
 
@@ -65,15 +55,15 @@ Ws.io?.on('connection', (socket) => {
 
 
 
-  socket.on('iread-message', (message) => {
+  socket.on('iread-message', async (message) => {
     if (!message) {
       return
     }
-
     const sender = onlineUser.get(message.sender.phone_number)
 
     if (!sender) {
       // Save message status to Redis Storage - sender well pull messages status later .
+      await messagesController.saveMessage(message)
       return
     }
 
