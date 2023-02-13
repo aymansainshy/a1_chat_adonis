@@ -19,7 +19,7 @@ export default class MessagesController {
                 receiver: message.receiver.id,
             }
 
-            const foundedMessage = await Message.find(message.id);
+            const foundedMessage = await Message.find(message.uuid);
             if (foundedMessage) {
                 foundedMessage.uuid = message.uuid,
                     foundedMessage.is_read = message.is_read,
@@ -70,11 +70,16 @@ export default class MessagesController {
     public async getUserMessages(ctx: HttpContextContract) {
         const sender = ctx.request.param('id')
 
-        console.log("Sender ...........")
-        console.log(sender)
-
         try {
             const userLastMessages: Message[] = await Message.query().where('sender', sender).preload('content')
+            if (!userLastMessages) {
+                return ctx.response.send({
+                    code: 1,
+                    message: 'User Messages',
+                    data: []
+                })
+            }
+            await Message.query().where('sender', sender).delete()
 
             const messagesWithUsers = await this.fetchMessageWithUsers(userLastMessages)
 
@@ -100,17 +105,18 @@ export default class MessagesController {
     public async getUserReceivedMessages(ctx: HttpContextContract) {
         const receiver = ctx.request.param('id')
 
-        console.log("receiver ...........")
-        console.log(receiver)
-
         try {
             const userReceivedMessages: Message[] = await Message.query().where('receiver', receiver).preload('content')
+            if (!userReceivedMessages) {
+                return ctx.response.send({
+                    code: 1,
+                    message: 'User Messages',
+                    data: []
+                })
+            }
             await Message.query().where('receiver', receiver).delete()
-            
 
             const messagesWithUsers = await this.fetchMessageWithUsers(userReceivedMessages)
-
-            // console.log(messagesWithUsers)
 
             return ctx.response.send({
                 code: 1,
