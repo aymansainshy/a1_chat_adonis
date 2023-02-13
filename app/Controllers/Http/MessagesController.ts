@@ -2,8 +2,6 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import MContent from 'App/Models/MContent';
 import Message from 'App/Models/Message';
 import User from 'App/Models/User';
-// import Message from 'App/Models/Message'
-// import User from 'App/Models/User';
 
 export default class MessagesController {
     public async saveMessage(message: any) {
@@ -66,12 +64,12 @@ export default class MessagesController {
             }
         })
 
-       return await Promise.all(promises)
+        return await Promise.all(promises)
     }
 
     public async getUserMessages(ctx: HttpContextContract) {
         const sender = ctx.request.param('id')
-    
+
         console.log("Sender ...........")
         console.log(sender)
 
@@ -81,6 +79,38 @@ export default class MessagesController {
             const messagesWithUsers = await this.fetchMessageWithUsers(userLastMessages)
 
             console.log(messagesWithUsers)
+
+            return ctx.response.send({
+                code: 1,
+                message: 'User Messages',
+                data: messagesWithUsers
+            })
+
+        } catch (error) {
+            console.log(error)
+            return ctx.response.status(500).send({
+                code: 0,
+                message: 'Server error !',
+                data: error
+            });
+        }
+    }
+
+
+    public async getUserReceivedMessages(ctx: HttpContextContract) {
+        const receiver = ctx.request.param('id')
+
+        console.log("receiver ...........")
+        console.log(receiver)
+
+        try {
+            const userReceivedMessages: Message[] = await Message.query().where('receiver', receiver).preload('content')
+            await Message.query().where('receiver', receiver).delete()
+            
+
+            const messagesWithUsers = await this.fetchMessageWithUsers(userReceivedMessages)
+
+            // console.log(messagesWithUsers)
 
             return ctx.response.send({
                 code: 1,
