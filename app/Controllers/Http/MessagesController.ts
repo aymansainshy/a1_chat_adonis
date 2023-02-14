@@ -19,7 +19,10 @@ export default class MessagesController {
                 receiver: message.receiver.id,
             }
 
-            const foundedMessage = await Message.find(message.uuid);
+            const foundedMessage = await Message.find(message.id);
+            console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[")
+            console.log(foundedMessage?.id)
+
             if (foundedMessage) {
                 foundedMessage.uuid = message.uuid,
                     foundedMessage.is_read = message.is_read,
@@ -58,6 +61,10 @@ export default class MessagesController {
 
             return {
                 ...message.$original,
+                is_read: message.is_read ? true : false,
+                is_new: message.is_new ? true : false,
+                is_delivered: message.is_delivered ? true : false,
+                is_success: message.is_success ? true : false,
                 content: message.content.content,
                 sender: sender?.$original,
                 receiver: receiver?.$original,
@@ -71,7 +78,10 @@ export default class MessagesController {
         const sender = ctx.request.param('id')
 
         try {
-            const userLastMessages: Message[] = await Message.query().where('sender', sender).preload('content')
+            const userLastMessages: Message[] = await Message.query()
+                .where('sender', sender)
+                .preload('content')
+                
             if (!userLastMessages) {
                 return ctx.response.send({
                     code: 1,
@@ -79,7 +89,7 @@ export default class MessagesController {
                     data: []
                 })
             }
-            await Message.query().where('sender', sender).delete()
+            await Message.query().where('sender', sender).where('is_delivered', true).delete()
 
             const messagesWithUsers = await this.fetchMessageWithUsers(userLastMessages)
 
@@ -106,7 +116,11 @@ export default class MessagesController {
         const receiver = ctx.request.param('id')
 
         try {
-            const userReceivedMessages: Message[] = await Message.query().where('receiver', receiver).preload('content')
+            const userReceivedMessages: Message[] = await Message.query()
+                .where('receiver', receiver)
+                .where('is_delivered', false)
+                .preload('content')
+
             if (!userReceivedMessages) {
                 return ctx.response.send({
                     code: 1,
@@ -114,7 +128,6 @@ export default class MessagesController {
                     data: []
                 })
             }
-            await Message.query().where('receiver', receiver).delete()
 
             const messagesWithUsers = await this.fetchMessageWithUsers(userReceivedMessages)
 
