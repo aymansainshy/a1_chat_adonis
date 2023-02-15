@@ -20,7 +20,7 @@ Ws.io?.on('connection', (socket) => {
 
 
 
-  socket.on('send-text-message', async (message) => {
+  socket.on('send-message', async (message) => {
     const receiver = onlineUser.get(message.receiver.phone_number)
 
     socket.emit('message-success', message)

@@ -20,9 +20,7 @@ export default class MessagesController {
             }
 
             const foundedMessage = await Message.find(message.id);
-            console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[")
-            console.log(foundedMessage?.id)
-
+            
             if (foundedMessage) {
                 foundedMessage.uuid = message.uuid,
                     foundedMessage.is_read = message.is_read,
@@ -41,7 +39,8 @@ export default class MessagesController {
 
                 await MContent.create({
                     message_id: newMessage.id,
-                    content: message.content,
+                    text: message.content.text,
+                    file: message.content.file,
                 })
 
                 console.log("Message Created Successfully")
@@ -65,7 +64,7 @@ export default class MessagesController {
                 is_new: message.is_new ? true : false,
                 is_delivered: message.is_delivered ? true : false,
                 is_success: message.is_success ? true : false,
-                content: message.content.content,
+                content: message.content.$original,
                 sender: sender?.$original,
                 receiver: receiver?.$original,
             }
@@ -81,7 +80,7 @@ export default class MessagesController {
             const userLastMessages: Message[] = await Message.query()
                 .where('sender', sender)
                 .preload('content')
-                
+
             if (!userLastMessages) {
                 return ctx.response.send({
                     code: 1,
