@@ -3,12 +3,15 @@ import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Message from './Message'
 
 
-export default class MContent extends BaseModel {
+export default class Mcontent extends BaseModel {
   @column({ isPrimary: true })
   public id!: number
 
   @column()
-  public content?: string
+  public text?: string
+
+  @column()
+  public file?: string
 
   @column()
   public message_id!: number

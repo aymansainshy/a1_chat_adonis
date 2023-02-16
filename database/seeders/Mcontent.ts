@@ -1,16 +1,16 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import MContent from 'App/Models/MContent'
 
-export default class extends BaseSeeder {
+export default class McontentSeeder extends BaseSeeder {
   public async run() {
    await MContent.createMany([
       {
         message_id: 1,
-        content: "hi",
+        text: "hi",
       },
       {
         message_id: 2,
-        content: "hi, How are you doing?",
+        text: "hi, How are you doing?",
       },
     ])
   }

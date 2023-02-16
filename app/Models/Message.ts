@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, hasOne, HasOne } from '@ioc:Adonis/Lucid/Orm'
 import MContent from './MContent'
+import { MessageType } from 'Contracts/enum'
 
 export default class Message extends BaseModel {
   @column({ isPrimary: true })
@@ -8,6 +9,9 @@ export default class Message extends BaseModel {
 
   @column()
   public uuid?: string
+
+  @column()
+  public type?: MessageType
 
   @column({
     serialize: (value?: Number) => {
