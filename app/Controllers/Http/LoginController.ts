@@ -25,8 +25,8 @@ export default class LoginController {
         phoneNumber: phoneNumber,
       })
 
-      const url = getSmsUrl(generatedOtp, phoneNumber)
-      await axios.get(url)
+      // const url = getSmsUrl(generatedOtp, phoneNumber)
+      // await axios.get(url)
 
       return ctx.response.created({
         code: 1,

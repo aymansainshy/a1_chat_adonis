@@ -10,6 +10,7 @@ const messagesController = new MessagesController()
 
 
 Ws.io?.on('connection', (socket) => {
+  console.log('User Connected ....')
 
   socket.on('user-connected', async (data) => {
     onlineUser.set(data.user.phone_number, { ...data.user, socketId: socket.id })

@@ -12,6 +12,7 @@ export default class MessagesController {
             const messageData = {
                 is_read: message.is_read,
                 uuid: message.uuid,
+                type: message.type,
                 is_success: message.is_success,
                 is_delivered: message.is_delivered,
                 is_new: message.is_new,
@@ -27,8 +28,6 @@ export default class MessagesController {
                     foundedMessage.is_success = message.is_success,
                     foundedMessage.is_delivered = message.is_delivered,
                     foundedMessage.is_new = message.is_new,
-                    foundedMessage.sender = message.sender.id,
-                    foundedMessage.receiver = message.receiver.id,
 
                     await foundedMessage.save()
 
@@ -57,6 +56,8 @@ export default class MessagesController {
 
             const sender = await User.find(message.sender)
             const receiver = await User.find(message.receiver)
+
+            console.log(sender)
 
             return {
                 ...message.$original,
