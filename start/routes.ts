@@ -39,4 +39,5 @@ Route.group(() => {
 
 Route.get('/user-received-messages/:id', 'MessagesController.getUserReceivedMessages').middleware('auth')
 Route.get('/user-messages/:id', 'MessagesController.getUserMessages').middleware('auth')
+Route.post('/upload-message-file', 'MessagesController.uploadFile').middleware('auth')
 

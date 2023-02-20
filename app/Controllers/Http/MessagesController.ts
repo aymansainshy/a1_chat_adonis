@@ -146,4 +146,57 @@ export default class MessagesController {
             });
         }
     }
+
+
+
+    public async uploadFile(ctx: HttpContextContract) {
+        try {
+            
+            const image = ctx.request.file('image', {
+                size: '5mb',
+                extnames: ['jpg', 'png', 'gif', 'jpeg'],
+            })
+
+
+            if (!image) {
+                return ctx.response.status(410).send({
+                    code: 0,
+                    message: 'Invalid image!',
+                    data: {}
+                });
+            }
+
+            if (!image.isValid) {
+                return ctx.response.status(413).send({
+                    code: 0,
+                    message: 'image error !',
+                    data: image.errors
+                });
+            }
+
+
+            if (image) {
+                // await image.move(Application.tmpPath('uploads'))
+                // console.log(`File name ->  ${image?.fieldName}`);
+
+                await image.moveToDisk('./images/')
+
+                const fileName = image?.fileName
+
+                return ctx.response.status(203).send({
+                    code: 1,
+                    message: 'Image updated successfully !',
+                    data: fileName
+                })
+            }
+
+        } catch (error) {
+            console.log(error);
+            return ctx.response.status(500).send({
+                code: 0,
+                message: 'Server error !',
+                data: error
+            });
+        }
+    }
 }
