@@ -32,7 +32,7 @@ Ws.io?.on('connection', (socket) => {
       await messagesController.saveMessage(message)
       return
     }
-    socket.to(receiver.socketId).emit('send-text-message', message)
+    socket.to(receiver.socketId).emit('send-message', message)
   })
 
 
