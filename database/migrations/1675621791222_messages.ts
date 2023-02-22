@@ -1,12 +1,17 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import { MessageType } from 'Contracts/enum'
 
-export default class Message extends BaseSchema {
+export default class extends BaseSchema {
   protected tableName = 'messages'
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
       table.string('uuid').notNullable()
+
+      table.enum('type', Object.values(MessageType))
+      .defaultTo(MessageType.TEXT)
+      .notNullable()
 
       table.integer('sender').unsigned().notNullable().references('id').inTable('users').onDelete('CASCADE')
       table.integer('receiver').unsigned().notNullable().references('id').inTable('users').onDelete('CASCADE')
@@ -25,3 +30,6 @@ export default class Message extends BaseSchema {
     this.schema.dropTable(this.tableName)
   }
 }
+
+
+

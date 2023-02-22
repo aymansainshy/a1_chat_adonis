@@ -12,6 +12,7 @@ export default class MessagesController {
             const messageData = {
                 is_read: message.is_read,
                 uuid: message.uuid,
+                type: message.type,
                 is_success: message.is_success,
                 is_delivered: message.is_delivered,
                 is_new: message.is_new,
@@ -20,17 +21,13 @@ export default class MessagesController {
             }
 
             const foundedMessage = await Message.find(message.id);
-            console.log("[[[[[[[[[[[[[[[[[[[[[[[[[[[")
-            console.log(foundedMessage?.id)
-
+            
             if (foundedMessage) {
                 foundedMessage.uuid = message.uuid,
                     foundedMessage.is_read = message.is_read,
                     foundedMessage.is_success = message.is_success,
                     foundedMessage.is_delivered = message.is_delivered,
                     foundedMessage.is_new = message.is_new,
-                    foundedMessage.sender = message.sender.id,
-                    foundedMessage.receiver = message.receiver.id,
 
                     await foundedMessage.save()
 
@@ -41,7 +38,8 @@ export default class MessagesController {
 
                 await MContent.create({
                     message_id: newMessage.id,
-                    content: message.content,
+                    text: message.content.text,
+                    file: message.content.file,
                 })
 
                 console.log("Message Created Successfully")
@@ -59,13 +57,15 @@ export default class MessagesController {
             const sender = await User.find(message.sender)
             const receiver = await User.find(message.receiver)
 
+            console.log(sender)
+
             return {
                 ...message.$original,
                 is_read: message.is_read ? true : false,
                 is_new: message.is_new ? true : false,
                 is_delivered: message.is_delivered ? true : false,
                 is_success: message.is_success ? true : false,
-                content: message.content.content,
+                content: message.content.$original,
                 sender: sender?.$original,
                 receiver: receiver?.$original,
             }
@@ -81,7 +81,7 @@ export default class MessagesController {
             const userLastMessages: Message[] = await Message.query()
                 .where('sender', sender)
                 .preload('content')
-                
+
             if (!userLastMessages) {
                 return ctx.response.send({
                     code: 1,
@@ -139,6 +139,59 @@ export default class MessagesController {
 
         } catch (error) {
             console.log(error)
+            return ctx.response.status(500).send({
+                code: 0,
+                message: 'Server error !',
+                data: error
+            });
+        }
+    }
+
+
+
+    public async uploadFile(ctx: HttpContextContract) {
+        try {
+            
+            const image = ctx.request.file('image', {
+                size: '5mb',
+                extnames: ['jpg', 'png', 'gif', 'jpeg'],
+            })
+
+
+            if (!image) {
+                return ctx.response.status(410).send({
+                    code: 0,
+                    message: 'Invalid image!',
+                    data: {}
+                });
+            }
+
+            if (!image.isValid) {
+                return ctx.response.status(413).send({
+                    code: 0,
+                    message: 'image error !',
+                    data: image.errors
+                });
+            }
+
+
+            if (image) {
+                // await image.move(Application.tmpPath('uploads'))
+                // console.log(`File name ->  ${image?.fieldName}`);
+
+                await image.moveToDisk('./images/')
+
+                const fileName = image?.fileName
+
+                return ctx.response.status(203).send({
+                    code: 1,
+                    message: 'Image updated successfully !',
+                    data: fileName
+                })
+            }
+
+        } catch (error) {
+            console.log(error);
             return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',

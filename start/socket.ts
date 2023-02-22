@@ -10,6 +10,7 @@ const messagesController = new MessagesController()
 
 
 Ws.io?.on('connection', (socket) => {
+  console.log('User Connected ....')
 
   socket.on('user-connected', async (data) => {
     onlineUser.set(data.user.phone_number, { ...data.user, socketId: socket.id })
@@ -20,7 +21,7 @@ Ws.io?.on('connection', (socket) => {
 
 
 
-  socket.on('send-text-message', async (message) => {
+  socket.on('send-message', async (message) => {
     const receiver = onlineUser.get(message.receiver.phone_number)
 
     socket.emit('message-success', message)
