@@ -89,7 +89,7 @@ export default class MessagesController {
                     data: []
                 })
             }
-            await Message.query().where('sender', sender).where('is_delivered', true).delete()
+            await Message.query().where('sender', sender).where('is_delivered', 1).delete()
 
             const messagesWithUsers = await this.fetchMessageWithUsers(userLastMessages)
 
@@ -118,7 +118,7 @@ export default class MessagesController {
         try {
             const userReceivedMessages: Message[] = await Message.query()
                 .where('receiver', receiver)
-                .where('is_delivered', false)
+                .where('is_delivered', 0)
                 .preload('content')
 
             if (!userReceivedMessages) {
