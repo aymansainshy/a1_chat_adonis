@@ -6,9 +6,9 @@ export default class OnlineUsersController {
     public async getOnlineUsers(ctx: HttpContextContract) {
         try {
 
-            var onlineUser = Array.from(socketContainer().values()) 
+            var onlineUser = Array.from(socketContainer().values())
             console.log(onlineUser);
-    
+
             return ctx.response.status(200).send({
                 code: 1,
                 message: 'founded data',

@@ -21,7 +21,7 @@ export default class MessagesController {
             }
 
             const foundedMessage = await Message.find(message.id);
-            
+
             if (foundedMessage) {
                 foundedMessage.uuid = message.uuid,
                     foundedMessage.is_read = message.is_read,
@@ -151,7 +151,7 @@ export default class MessagesController {
 
     public async uploadFile(ctx: HttpContextContract) {
         try {
-            
+
             const image = ctx.request.file('image', {
                 size: '5mb',
                 extnames: ['jpg', 'png', 'gif', 'jpeg'],
