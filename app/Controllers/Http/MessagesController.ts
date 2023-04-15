@@ -1,7 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import MContent from 'App/Models/MContent';
-import Message from 'App/Models/Message';
-import User from 'App/Models/User';
+import MContent from 'App/Models/MContent'
+import Message from 'App/Models/Message'
+import User from 'App/Models/User'
 
 export default class MessagesController {
     public async saveMessage(message: any) {
@@ -20,21 +20,20 @@ export default class MessagesController {
                 receiver: message.receiver.id,
             }
 
-            const foundedMessage = await Message.find(message.id);
+            const foundedMessage = await Message.find(message.id)
 
             if (foundedMessage) {
-                foundedMessage.uuid = message.uuid,
-                    foundedMessage.is_read = message.is_read,
-                    foundedMessage.is_success = message.is_success,
-                    foundedMessage.is_delivered = message.is_delivered,
-                    foundedMessage.is_new = message.is_new,
-
+                ; (foundedMessage.uuid = message.uuid),
+                    (foundedMessage.is_read = message.is_read),
+                    (foundedMessage.is_success = message.is_success),
+                    (foundedMessage.is_delivered = message.is_delivered),
+                    (foundedMessage.is_new = message.is_new),
                     await foundedMessage.save()
 
-                console.log("Message Updated Successfully")
+                console.log('Message Updated Successfully')
             } else {
                 // This part for the sender to save message when the reciever not connected .
-                const newMessage = await Message.create(messageData);
+                const newMessage = await Message.create(messageData)
 
                 await MContent.create({
                     message_id: newMessage.id,
@@ -42,18 +41,15 @@ export default class MessagesController {
                     file: message.content.file,
                 })
 
-                console.log("Message Created Successfully")
+                console.log('Message Created Successfully')
             }
-
         } catch (error) {
             console.log(error)
         }
     }
 
-    fetchMessageWithUsers = async (messages: Message[]) => {
-
+    private fetchMessageWithUsers = async (messages: Message[]) => {
         const promises = messages.map(async (message: Message) => {
-
             const sender = await User.find(message.sender)
             const receiver = await User.find(message.receiver)
 
@@ -86,7 +82,7 @@ export default class MessagesController {
                 return ctx.response.send({
                     code: 1,
                     message: 'User Messages',
-                    data: []
+                    data: [],
                 })
             }
             await Message.query().where('sender', sender).where('is_delivered', 1).delete()
@@ -98,19 +94,17 @@ export default class MessagesController {
             return ctx.response.send({
                 code: 1,
                 message: 'User Messages',
-                data: messagesWithUsers
+                data: messagesWithUsers,
             })
-
         } catch (error) {
             console.log(error)
             return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
-                data: error
-            });
+                data: error,
+            })
         }
     }
-
 
     public async getUserReceivedMessages(ctx: HttpContextContract) {
         const receiver = ctx.request.param('id')
@@ -125,7 +119,7 @@ export default class MessagesController {
                 return ctx.response.send({
                     code: 1,
                     message: 'User Messages',
-                    data: []
+                    data: [],
                 })
             }
 
@@ -134,46 +128,40 @@ export default class MessagesController {
             return ctx.response.send({
                 code: 1,
                 message: 'User Messages',
-                data: messagesWithUsers
+                data: messagesWithUsers,
             })
-
         } catch (error) {
             console.log(error)
             return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
-                data: error
-            });
+                data: error,
+            })
         }
     }
 
-
-
     public async uploadFile(ctx: HttpContextContract) {
         try {
-
             const image = ctx.request.file('image', {
                 size: '5mb',
                 extnames: ['jpg', 'png', 'gif', 'jpeg'],
             })
 
-
             if (!image) {
                 return ctx.response.status(410).send({
                     code: 0,
                     message: 'Invalid image!',
-                    data: {}
-                });
+                    data: {},
+                })
             }
 
             if (!image.isValid) {
                 return ctx.response.status(413).send({
                     code: 0,
                     message: 'image error !',
-                    data: image.errors
-                });
+                    data: image.errors,
+                })
             }
-
 
             if (image) {
                 // await image.move(Application.tmpPath('uploads'))
@@ -186,17 +174,16 @@ export default class MessagesController {
                 return ctx.response.status(203).send({
                     code: 1,
                     message: 'Image updated successfully !',
-                    data: fileName
+                    data: fileName,
                 })
             }
-
         } catch (error) {
-            console.log(error);
+            console.log(error)
             return ctx.response.status(500).send({
                 code: 0,
                 message: 'Server error !',
-                data: error
-            });
+                data: error,
+            })
         }
     }
 }
