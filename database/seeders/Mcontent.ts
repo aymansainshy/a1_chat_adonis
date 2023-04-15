@@ -3,14 +3,14 @@ import MContent from 'App/Models/MContent'
 
 export default class McontentSeeder extends BaseSeeder {
   public async run() {
-   await MContent.createMany([
-      {
-        message_id: 1,
-        text: "hi",
-      },
+    await MContent.createMany([
       {
         message_id: 2,
-        text: "hi, How are you doing?",
+        text: 'hi',
+      },
+      {
+        message_id: 3,
+        text: 'hi, How are you doing?',
       },
     ])
   }

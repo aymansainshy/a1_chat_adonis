@@ -20,12 +20,12 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-
-
 Route.group(() => {
   Route.post('/', 'LoginController.sendOtp')
   Route.post('/confirmotp', 'LoginController.confirmOtp')
-}).prefix('/login').middleware('loginValidator')
+})
+  .prefix('/login')
+  .middleware('loginValidator')
 
 Route.get('/online-users', 'OnlineUsersController.getOnlineUsers')
 
@@ -34,10 +34,12 @@ Route.group(() => {
   Route.put('/update-phone', 'UsersController.updataPhone')
   Route.put('/confirm-mupdate-phone/:id', 'UsersController.confirmUpdatePhone')
   Route.post('/update-image/:id', 'UsersController.updateImge')
-}).prefix('/user').middleware('auth')
+})
+  .prefix('/user')
+  .middleware('auth')
 
-
-Route.get('/user-received-messages/:id', 'MessagesController.getUserReceivedMessages').middleware('auth')
+Route.get('/user-received-messages/:id', 'MessagesController.getUserReceivedMessages').middleware(
+  'auth'
+)
 Route.get('/user-messages/:id', 'MessagesController.getUserMessages').middleware('auth')
 Route.post('/upload-message-file', 'MessagesController.uploadFile').middleware('auth')
-

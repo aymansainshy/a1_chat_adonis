@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Message from './Message'
 
-
 export default class Mcontent extends BaseModel {
   @column({ isPrimary: true })
   public id!: number
@@ -23,5 +22,5 @@ export default class Mcontent extends BaseModel {
   public updatedAt!: DateTime
 
   @belongsTo(() => Message)
-  message!: BelongsTo<typeof Message>
+  public message!: BelongsTo<typeof Message>
 }

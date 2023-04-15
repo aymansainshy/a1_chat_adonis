@@ -9,7 +9,7 @@ let otpContainer = container()
 export default class LoginController {
   public async sendOtp(ctx: HttpContextContract) {
     try {
-   
+
 
       const phoneNumber = ctx.request.input('phone_number')
 
